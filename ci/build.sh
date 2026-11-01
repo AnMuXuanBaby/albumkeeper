@@ -26,6 +26,7 @@ xcrun --sdk iphoneos swiftc \
   -framework SwiftUI \
   -framework UIKit \
   -framework Photos \
+  -framework PhotosUI \
   -framework AVKit \
   -framework AVFoundation \
   -framework Vision \

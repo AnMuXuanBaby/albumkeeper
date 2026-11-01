@@ -1,6 +1,7 @@
 import Foundation
 import Combine
 import Photos
+import PhotosUI
 import AVFoundation
 import UIKit
 
@@ -275,7 +276,7 @@ final class PhotoLibraryService: ObservableObject {
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
             PHPhotoLibrary.shared().performChanges({
                 fetch.enumerateObjects { asset, _, _ in
-                    PHAssetChangeRequest(for: asset)?.isFavorite = favorite
+                    PHAssetChangeRequest(for: asset).isFavorite = favorite
                 }
             }, completionHandler: { success, error in
                 if success {
