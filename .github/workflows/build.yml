@@ -1,0 +1,48 @@
+name: Build IPA
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Locate project
+        run: |
+          if [ -f ci/build.sh ]; then
+            echo "PROJECT_DIR=." >> "$GITHUB_ENV"
+            echo "IPA_PATH=AlbumKeeper.ipa" >> "$GITHUB_ENV"
+          else
+            echo "PROJECT_DIR=AlbumKeeper" >> "$GITHUB_ENV"
+            echo "IPA_PATH=AlbumKeeper/AlbumKeeper.ipa" >> "$GITHUB_ENV"
+          fi
+
+      - name: Show toolchain
+        run: |
+          xcodebuild -version
+          xcrun --sdk iphoneos --show-sdk-path
+
+      - name: Build unsigned IPA
+        run: bash "$PROJECT_DIR/ci/build.sh"
+
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: AlbumKeeper-ipa
+          path: ${{ env.IPA_PATH }}
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: "build-${{ github.run_number }}-${{ github.run_attempt }}"
+          name: "相册管家 build ${{ github.run_number }}"
+          files: ${{ env.IPA_PATH }}
+          make_latest: "true"
